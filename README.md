@@ -46,3 +46,6 @@ Code,Name,C,M,Y,K,R,G,B,Hex
 
 [And here's the final TSV file](https://github.com/DrCuff/WinsorExtractor/blob/main/paint_colors_by_hue.tsv)
 
+Finally, 
+
+[This is the PDF from where we started with](https://github.com/DrCuff/WinsorExtractor/blob/main/WinsorNewtonOilPaintChart.pdf)
