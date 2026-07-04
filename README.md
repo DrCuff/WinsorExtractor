@@ -1,5 +1,7 @@
 ## quick and dirty two step process to generate RGB from a supplied PDF:
 
+Super dirty two step quick hack to extract CMYK from Winsor and Newton reference PDF which contains polygon fills of their paints. They no longer supply physical paint dot cards, so here we are.  Do not use in nuclear facilities or aircraft control systems, this is about as quick and dirty as it gets.  
+
 Uses the system .icc files:
 
 ```
