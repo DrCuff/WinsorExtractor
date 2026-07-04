@@ -1,16 +1,36 @@
-## quick and dirty two step process to generate RGB from a supplied PDF:
+## quick and dirty two step process to generate RGB from a supplied PDF
 
 Super dirty two step quick hack to extract CMYK from Winsor and Newton reference PDF which contains polygon fills of their paints. They no longer supply physical paint dot cards, so here we are.  Do not use in nuclear facilities or aircraft control systems, this is about as quick and dirty as it gets.  
 
-Uses the system .icc files:
+Here's the PDF alonside the extracted data, and the macOS "color picker" with a small aperture.  It's pretty close, rounding errors exist, this was more to test if it was even possible.  You can see the comparison with Rose Madder Genuine, they all wobble around.  For example when we use colorimeters to do this we have to take three samples and average.  Fortunately our use case is in painting, and even mixing these colors requires amazing technical skill which is way beyond the scope of this dodgy python script.
+
+It was created with two oneshot LLM prompts:
+
+_“This PDF contains CMYK polygon fills of paint swatches, can you extract the CMYK values and the paint swatch names "e.g. Cadmium Yellow" so we can ground truth further analysis from the values inside the PDF, create a table of output.”_
+
+<img src="screencap.png" width="1000">
+
+[Here's what it all looks like as HTML by the end of it](https://htmlpreview.github.io/?https://raw.githubusercontent.com/DrCuff/WinsorExtractor/refs/heads/main/image_check.html)
+
+[And here's the final TSV file](https://github.com/DrCuff/WinsorExtractor/blob/main/paint_colors_by_hue.tsv)
+
+Finally, 
+
+[This is the PDF from where we started with](https://github.com/DrCuff/WinsorExtractor/blob/main/WinsorNewtonOilPaintChart.pdf)
+
+
+## If you want to run this
+
+To start with this uses the system .icc files which can be found here on macOS, there are lots of icc files, conversions and such, this is a bit of a weird science.  I picked "standard" sRGB to convert from CMYK.  We have no clue how the original PDF was created only that it contains polygon fills with CMYK values we can extract with the pdfplumber module in python.
 
 ```
 cp /System/Library/ColorSync/Profiles/Generic\ CMYK\ Profile.icc ./CMYK.icc
-
 cp /System/Library/ColorSync/Profiles/sRGB\ Profile.icc ./sRGB.icc
 ```
 
-Step 1 make the initial CMYK extraction csv (colorscript.py):
+**Step 1** 
+
+Make the initial CMYK extraction csv (colorscript.py), the module extracted the names into the hash and hardcoded them, there's no real reason to do this, but it was what we had until we ran out of credits, it will do for now:
 
 ```
 jcuff@midnight ~ % ~/.local/pipx/venvs/pdfplumber/bin/python ./colorscript.py
@@ -29,7 +49,9 @@ total rows written 138
 {'Code': '059', 'Name': 'Brown Ochre', 'C': 22.0, 'M': 63.0, 'Y': 100.0, 'K': 8.0}
 ```
 
-Step 2 create the RGB color map (convert_to_csv.py):
+**Step 2** 
+
+Create the RGB color map (convert_to_csv.py), this could have been incorporated into the colorscript.py, but the model refused to integrate them, and tried to make me design some PhD computer science program, where all I wanted was a quick conversion tool to read and write a csv file.  Because life is short, this is what we have:
 
 ```
 jcuff@midnight ~ % python3 ./convert_to_csv.py  ./paint_cmyk_values.csv paint_rgb_values.csv ./sRGB.icc 
@@ -40,12 +62,3 @@ Code,Name,C,M,Y,K,R,G,B,Hex
 004,Alizarin Crimson,22.0,100.0,98.0,15.0,153,38,42,#99262A
 025,Bismuth Yellow,11.0,0.0,84.0,0.0,229,229,83,#E5E553
 ```
-
-
-[Here's what it all looks like as HTML by the end of it](https://htmlpreview.github.io/?https://raw.githubusercontent.com/DrCuff/WinsorExtractor/refs/heads/main/image_check.html)
-
-[And here's the final TSV file](https://github.com/DrCuff/WinsorExtractor/blob/main/paint_colors_by_hue.tsv)
-
-Finally, 
-
-[This is the PDF from where we started with](https://github.com/DrCuff/WinsorExtractor/blob/main/WinsorNewtonOilPaintChart.pdf)
