@@ -1,7 +1,14 @@
 ## quick and dirty two step process to generate RGB from a supplied PDF:
 
+Uses the system .icc files:
 
-Step 1 (colorscript.py):
+```
+cp /System/Library/ColorSync/Profiles/Generic\ CMYK\ Profile.icc ./CMYK.icc
+
+cp /System/Library/ColorSync/Profiles/sRGB\ Profile.icc ./sRGB.icc
+```
+
+Step 1 make the initial CMYK extraction csv (colorscript.py):
 
 ```
 jcuff@midnight ~ % ~/.local/pipx/venvs/pdfplumber/bin/python ./colorscript.py
@@ -20,7 +27,7 @@ total rows written 138
 {'Code': '059', 'Name': 'Brown Ochre', 'C': 22.0, 'M': 63.0, 'Y': 100.0, 'K': 8.0}
 ```
 
-Step 2 (convert_to_csv.py):
+Step 2 create the RGB color map (convert_to_csv.py):
 
 ```
 jcuff@midnight ~ % python3 ./convert_to_csv.py  ./paint_cmyk_values.csv paint_rgb_values.csv ./sRGB.icc 
@@ -31,3 +38,9 @@ Code,Name,C,M,Y,K,R,G,B,Hex
 004,Alizarin Crimson,22.0,100.0,98.0,15.0,153,38,42,#99262A
 025,Bismuth Yellow,11.0,0.0,84.0,0.0,229,229,83,#E5E553
 ```
+
+
+[Here's what it all looks like as HTML by the end of it](https://htmlpreview.github.io/?https://raw.githubusercontent.com/DrCuff/WinsorExtractor/refs/heads/main/image_check.html)
+
+[And here's the final TSV file](https://github.com/DrCuff/WinsorExtractor/blob/main/paint_colors_by_hue.tsv)
+
